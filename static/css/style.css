@@ -2,6 +2,11 @@
 @import url("https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Exo+2:ital,wght@0,100..900;1,100..900&family=Lalezar&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap");
 
 /* Modern Dark Mode Reset */
+:root {
+	--top-bar-height: 64px;
+	--top-bar-gap: 20px;
+}
+
 * {
 	box-sizing: border-box;
 	margin: 0;
@@ -25,6 +30,10 @@ body {
 	align-items: center;
 	min-height: 100vh;
 	direction: rtl;
+}
+
+body.has-top-bar {
+	padding-top: calc(var(--top-bar-height) + var(--top-bar-gap));
 }
 
 /* Container */
@@ -124,15 +133,24 @@ button:hover {
 
 /* Header Elements */
 .top-bar {
-	position: absolute;
-	top: 20px;
-	right: 20px;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: var(--top-bar-height);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(18, 18, 18, 0.95);
+	border-bottom: 1px solid #2e2e2e;
+	backdrop-filter: blur(8px);
+	z-index: 2000;
 }
 
 .btn-logout {
 	color: #ff6b6b;
 	border: 1px solid #ff6b6b;
-	padding: 8px 16px;
+	padding: 8px 24px;
 	border-radius: 6px;
 	font-size: 0.9rem;
 	text-decoration: none;
@@ -145,18 +163,53 @@ button:hover {
 }
 
 /* Home Page Specifics */
+.home-container {
+	position: relative;
+	padding-top: 0;
+}
+
+.home-title-floating {
+	position: fixed;
+	top: 84px;
+	left: 50%;
+	transform: translateX(-50%);
+	margin: 0;
+	font-size: clamp(3.2rem, 7vw, 4.8rem);
+	line-height: 1;
+	z-index: 1500;
+	animation: titleGlow 2.8s ease-in-out infinite;
+}
+
+@media (max-width: 600px) {
+	.home-container {
+		padding-top: 0;
+	}
+
+	.home-title-floating {
+		top: 78px;
+	}
+}
+
 .home-container .date-display {
 	display: inline-block;
 	font-size: 1.3rem;
 	color: #ffd700;
-	margin: 1.5rem 0 3rem 0;
 	padding: 10px 30px;
-	border: 1px solid rgba(255, 215, 0, 0.3);
-	border-radius: 50px;
-	background: rgba(255, 215, 0, 0.05);
-	box-shadow: 0 0 15px rgba(255, 215, 0, 0.1);
 	letter-spacing: 2px;
-	animation: dateGlow 3s ease-in-out infinite;
+}
+
+@keyframes titleGlow {
+	0%,
+	100% {
+		text-shadow:
+			0 0 8px rgba(255, 215, 0, 0.35),
+			0 0 18px rgba(255, 215, 0, 0.2);
+	}
+	50% {
+		text-shadow:
+			0 0 14px rgba(255, 215, 0, 0.55),
+			0 0 28px rgba(255, 215, 0, 0.35);
+	}
 }
 
 .active-challenge-card {
@@ -262,18 +315,6 @@ button:hover {
 	line-height: 1;
 }
 
-@keyframes dateGlow {
-	0%,
-	100% {
-		box-shadow: 0 0 10px rgba(255, 215, 0, 0.1);
-		border-color: rgba(255, 215, 0, 0.2);
-	}
-	50% {
-		box-shadow: 0 0 20px rgba(255, 215, 0, 0.25);
-		border-color: rgba(255, 215, 0, 0.5);
-	}
-}
-
 .btn-start {
 	display: inline-block;
 	background: linear-gradient(45deg, #ffd700, #ffb900);
@@ -304,9 +345,13 @@ button:hover {
 	transform: translateX(-50%);
 	list-style: none;
 	padding: 0;
-	z-index: 1000;
+	z-index: 3001;
 	width: 90%;
 	max-width: 400px;
+}
+
+body.has-top-bar .flash-messages {
+	top: calc(var(--top-bar-height) + 12px);
 }
 
 .flash-messages li {

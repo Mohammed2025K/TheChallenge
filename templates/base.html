@@ -10,7 +10,7 @@
 			rel="stylesheet"
 			href="{{ url_for('static', filename='css/style.css') }}" />
 	</head>
-	<body>
+	<body{% if session.get('user_id') %} class="has-top-bar"{% endif %}>
 		{% if session.get('user_id') %}
 		<div class="top-bar">
 			<a href="{{ url_for('logout') }}" class="btn-logout">تسجيل خروج</a>
