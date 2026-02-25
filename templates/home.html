@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}التحدي - الرئيسية{% endblock %}
+
+{% block content %}
+<div class="home-container">
+    <div class="header-section">
+        <h1>التحدي</h1>
+        <p class="date-display">{{ current_date }}</p>
+    </div>
+
+    <div class="main-action">
+        <div class="challenges-list">
+            {% for c in challenges %}
+            <div class="challenge-item-card white-card">
+                <a href="{{ url_for('view_challenge', challenge_id=c.id) }}" class="challenge-link-integrated">
+                    {{ c.name }}
+                </a>
+                <form action="{{ url_for('delete_challenge', challenge_id=c.id) }}" method="POST" class="delete-form-integrated" onsubmit="return confirm('هل أنت متأكد من حذف هذا التحدي؟')">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+                    <button type="submit" class="btn-delete-integrated">×</button>
+                </form>
+            </div>
+            {% endfor %}
+            <button id="btn-start-challenge" class="btn-start-solid">ابدأ تحدي جديد</button>
+        </div>
+    </div>
+</div>
+
+<div id="challenge-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2>ابدأ تحدي جديد</h2>
+        <form id="create-challenge-form" method="POST" action="{{ url_for('create_challenge') }}" autocomplete="off">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+            <div class="form-group">
+                <label>اسم التحدي:</label>
+                <input type="text" name="name" required placeholder="مثال: تحدي 30 يوم" />
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>المدة (أيام):</label>
+                    <input type="number" name="duration" min="1" value="30" required />
+                </div>
+                <div class="form-group">
+                    <label>تاريخ البدء:</label>
+                    <input type="date" name="start_date" required id="start-date-input" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>المهام الثابتة (يوميًا):</label>
+                <div id="fixed-tasks-container">
+                    <div class="task-input-row">
+                        <input type="text" name="fixed_tasks[]" required placeholder="مثال: قراءة 10 صفحات" />
+                    </div>
+                </div>
+                <button type="button" id="add-task-btn" class="btn-secondary">+ إضافة مهمة</button>
+            </div>
+
+            <button type="submit" class="btn-submit">إنشاء التحدي</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

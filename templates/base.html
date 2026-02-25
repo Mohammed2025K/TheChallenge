@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="csrf-token" content="{{ csrf_token }}" />
+		<title>{% block title %}التحدي{% endblock %}</title>
+		<link rel="icon" type="image/x-icon" href="/static/favicon.svg" />
+		<link
+			rel="stylesheet"
+			href="{{ url_for('static', filename='css/style.css') }}" />
+	</head>
+	<body>
+		{% if session.get('user_id') %}
+		<div class="top-bar">
+			<a href="{{ url_for('logout') }}" class="btn-logout">تسجيل خروج</a>
+		</div>
+		{% endif %} {% with messages = get_flashed_messages() %} {% if messages %}
+		<ul class="flash-messages">
+			{% for message in messages %}
+			<li>{{ message }}</li>
+			{% endfor %}
+		</ul>
+		{% endif %} {% endwith %}
+
+		<main class="container">{% block content %}{% endblock %}</main>
+
+		<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+	</body>
+</html>

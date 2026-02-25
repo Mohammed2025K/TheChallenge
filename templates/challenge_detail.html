@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}التحدي: {{ challenge.name }}{% endblock %}
+
+{% block content %}
+<div class="home-container">
+    <div class="header-section">
+        <a href="{{ url_for('home') }}" class="btn-back">العودة للرئيسية</a>
+        <h1>{{ challenge.name }}</h1>
+        <p class="date-display">{{ current_date }}</p>
+    </div>
+
+    <div class="active-challenge-card">
+        <div class="chart-wrapper">
+            <div class="chart-container" data-total-days="{{ challenge.duration_days }}">
+                <canvas id="progressChart"></canvas>
+            </div>
+        </div>
+
+        <div class="days-grid">
+            {% for d in range(1, challenge.duration_days + 1) %}
+            <div class="day-card-summary {% if d == current_day_number and not is_finished %}current-day{% endif %}" onclick="openDayModal({{ d }})">
+                <span class="day-number">اليوم {{ d }}</span>
+
+                {% set daily_tasks = tasks_by_day.get(d, []) %}
+                {% set total = daily_tasks|length %}
+                {% set completed = daily_tasks|selectattr("is_completed", "equalto", true)|list|length %}
+                {% set percent = (completed / total * 100)|round|int if total > 0 else 0 %}
+
+                <div class="day-progress-container">
+                    <div id="progress-bar-{{ d }}" class="day-progress-fill" style="width: {{ percent }}%;"></div>
+                </div>
+                <span id="progress-text-{{ d }}" class="progress-text">{{ percent }}%</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script id="tasks-data" type="application/json">
+{
+    "current_day": {{ current_day_number }},
+    "challenge_id": {{ challenge.id }},
+    "is_finished": {{ 'true' if is_finished else 'false' }},
+    "csrf_token": {{ csrf_token|tojson }},
+    "progress_data": {{ daily_progress_data | tojson }},
+    "days": {
+        {% for d in range(1, challenge.duration_days + 1) %}
+        "{{ d }}": [
+            {% for task in tasks_by_day.get(d, []) %}
+            {
+                "id": {{ task.id }},
+                "name": {{ task.name | tojson }},
+                "is_fixed": {{ 'true' if task.is_fixed else 'false' }},
+                "is_completed": {{ 'true' if task.is_completed else 'false' }}
+            }{{ "," if not loop.last }}
+            {% endfor %}
+        ]{{ "," if not loop.last }}
+        {% endfor %}
+    }
+}
+</script>
+
+<div id="day-modal" class="modal">
+    <div class="modal-content day-modal-content">
+        <span class="close-modal" onclick="closeDayModal()">&times;</span>
+        <h2 id="day-modal-title">تفاصيل اليوم</h2>
+
+        <div id="day-tasks-list" class="tasks-list"></div>
+
+        {% if not is_finished %}
+        <form id="add-daily-task-form" class="add-task-form" onsubmit="submitAddTask(event)">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+            <input type="hidden" name="challenge_id" value="{{ challenge.id }}" id="modal-challenge-id" />
+            <input type="hidden" name="day_number" id="modal-day-number" />
+            <div class="input-with-btn">
+                <input type="text" name="task_name" required placeholder="إضافة مهمة جديدة..." id="new-task-input" />
+                <button type="submit" class="btn-add">+</button>
+            </div>
+        </form>
+        {% endif %}
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
